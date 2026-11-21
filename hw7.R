@@ -22,8 +22,36 @@ make_a_summary_table(x="smoker3", y=data$chd)
 make_a_summary_table(x="sex", y=data$chd)
 make_a_summary_table(x="diabetes", y=data$chd)
 
-t.test(dat[which(dat$chd=="No CHD"), "bmi"], dat[which(dat$chd=="Has CHD"), "bmi"])
-round(sd(dat[which(dat$chd=="No CHD"), "bmi"]), digits=2)
-round(sd(dat[which(dat$chd=="Has CHD"), "bmi"]), digits=2)
+
+data |> 
+  group_by(chd) |>
+  summarize(mean_bmi = mean(bmi))
+t.test(data[which(data$chd=="No CHD"), "bmi"], data[which(data$chd=="Has CHD"), "bmi"])
+round(sd(data[which(data$chd=="No CHD"), "bmi"]), digits=2)
+round(sd(data[which(data$chd=="Has CHD"), "bmi"]), digits=2)
+
+# logistic regression
+
+# ordinal coding
+mylogit <- glm(data$chd ~ data$smoker3, family = "binomial")
+cbind(Beta_coefficient = coef(mylogit), confint(mylogit))
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+
+# categorical coding
+mylogit <- glm(data$chd ~ as.factor(data$smoker3), family = "binomial")
+cbind(Beta_coefficient = coef(mylogit), confint(mylogit))
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+
+
+# assess if sex is an effect measure modifier
+
+mylogit <- glm(data$chd ~ as.factor(data$smoker3) + data$sex + as.factor(data$smoker3)*data$sex, family = "binomial")
+summary(mylogit)
+
+# likelihood ratio test
+
+a <- glm(data$chd ~ as.factor(data$smoker3) + data$sex + as.factor(data$smoker3)*data$sex, family = "binomial")
+b <- glm(dat$chd ~ as.factor(data$smoker3) + data$sex, family = "binomial")
+lrtest(a, b) 
 
 
