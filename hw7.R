@@ -3,6 +3,7 @@ library(tidyverse)
 library(DescTools)
 library(expss)
 library(here)
+library(lmtest)
 
 exp(0.34)
 
@@ -51,7 +52,29 @@ summary(mylogit)
 # likelihood ratio test
 
 a <- glm(data$chd ~ as.factor(data$smoker3) + data$sex + as.factor(data$smoker3)*data$sex, family = "binomial")
-b <- glm(dat$chd ~ as.factor(data$smoker3) + data$sex, family = "binomial")
+b <- glm(data$chd ~ as.factor(data$smoker3) + data$sex, family = "binomial")
 lrtest(a, b) 
 
+# assess if sex, diabete, and bmi are confounders
+
+mylogit <- glm(data$chd ~ as.factor(data$smoker3), family = "binomial")
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+
+# sex
+mylogit <- glm(data$chd ~ as.factor(data$smoker3) + data$sex, family = "binomial")
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+
+# diabete
+mylogit <- glm(data$chd ~ as.factor(data$smoker3) + data$diabetes, family = "binomial")
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+
+# bmi
+mylogit <- glm(data$chd ~ as.factor(data$smoker3) + data$bmi, family = "binomial")
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+  
+# final interpretation
+
+# sex
+mylogit <- glm(data$chd ~ as.factor(data$smoker3) + data$sex, family = "binomial")
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
 
